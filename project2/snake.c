@@ -160,6 +160,23 @@ int8_t advance_snake_head(void) {
 			}
             break;
 		/* YOUR CODE HERE to deal with other directions */
+		case SNAKE_DOWN:
+			if(headY == 0) {
+			// Head is already at the bottom of the board - wrap around
+			headY = BOARD_HEIGHT-1;
+			} else {
+			headY -= 1;
+			}
+			break;
+		case SNAKE_LEFT:
+			if(headX == 0) {
+				// Snake head is already at the right hand edge of the board
+				// - wrap around to left hand side
+				headX = BOARD_WIDTH - 1;
+			} else {
+				headX -= 1;
+			}
+		break;
     }
 
 	newHeadPosn = position(headX, headY);
@@ -247,6 +264,10 @@ void set_snake_dirn(SnakeDirnType dirn) {
 	** Initially, we assume the move is OK and just set the 
 	** next direction.
 	*/
+	if ((curSnakeDirn == SNAKE_LEFT && dirn == SNAKE_RIGHT) || (curSnakeDirn == SNAKE_RIGHT && dirn == SNAKE_LEFT) ||
+		(curSnakeDirn == SNAKE_UP && dirn == SNAKE_DOWN) || (curSnakeDirn == SNAKE_DOWN && dirn == SNAKE_UP)) {
+			return;	
+		}
     
     nextSnakeDirn = dirn;
 }
