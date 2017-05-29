@@ -1,4 +1,4 @@
-/*
+	/*
  * score.h
  * 
  * Author: Peter Sutton

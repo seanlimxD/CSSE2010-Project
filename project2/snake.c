@@ -191,7 +191,9 @@ int8_t advance_snake_head(void) {
 	** this move is permitted - the tail position won't be updated until after the
 	** head is advanced but we don't consider this a collision.
 	*/
-
+	if (is_snake_at(newHeadPosn) == 1 && newHeadPosn != get_snake_head_position()){
+		return COLLISION;
+	}
     /*
     ** If we get here, the move should be possible.
     ** Advance head by 1. First work out the index
