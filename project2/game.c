@@ -10,12 +10,18 @@
 #include "pixel_colour.h"
 #include "board.h"
 #include "ledmatrix.h"
+#include "score.h"
 
 // Colours that we'll use
 #define SNAKE_HEAD_COLOUR	COLOUR_RED
 #define SNAKE_BODY_COLOUR	COLOUR_GREEN
 #define FOOD_COLOUR			COLOUR_LIGHT_YELLOW
+#define SUPER_FOOD_COLOUR	COLOUR_ORANGE
 #define BACKGROUND_COLOUR	COLOUR_BLACK
+
+
+// Define time interval
+int time_elapse = 600;
 
 // Helper function
 static void update_display_at_position(PosnType posn, PixelColour colour) {
@@ -27,6 +33,7 @@ static void update_display_at_position(PosnType posn, PixelColour colour) {
 void init_game(void) {
 	// Clear display
 	ledmatrix_clear();
+	time_elapse = 600;
 	
 	// Initialise the snake and display it. We know the initial snake is only
 	// of length two so we can just retrieve the tail and head positions
@@ -59,7 +66,8 @@ int8_t attempt_to_move_snake_forward(void) {
 		// remove food item
 		int8_t foodID = food_at(new_head_position);
 		remove_food(foodID);
-		
+		add_to_score(3);
+		time_elapse-=15;
 		// Add a new food item. Might fail if a free position can't be 
 		// found on the board but shouldn't usually.
 		PosnType new_food_posn = add_food_item();
@@ -85,4 +93,9 @@ int8_t attempt_to_move_snake_forward(void) {
 	update_display_at_position(new_head_position, SNAKE_HEAD_COLOUR);
 	return 1;
 }
+
+int8_t get_time_elapse(){
+	return time_elapse;
+}
+
 

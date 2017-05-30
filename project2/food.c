@@ -92,6 +92,40 @@ PosnType add_food_item(void) {
 	return test_position;
 }
 
+PosnType add_super_food_item(void) {
+	/* Generate "random" positions until we get one which
+	** is not occupied by a snake or food.
+	*/
+	int8_t x, y, attempts;
+	PosnType test_position;
+	x = 0;
+	y = 0;
+	attempts = 0;
+	do {
+		// Generate a new position - this is based on a sequence rather
+		// then being random
+        x = (x+3+attempts)%BOARD_WIDTH;
+        y = (y+5)%BOARD_HEIGHT;
+		test_position = position(x,y);
+        attempts++;
+    } while(attempts < 100 && 
+                (is_snake_at(test_position) || is_food_at(test_position)));
+        
+    if(attempts >= 100) {
+        /* We tried 100 times to generate a position
+        ** but they were all occupied.
+        */
+        return INVALID_POSITION;
+    }
+	
+	// If we get here, we've found an unoccupied position (test_position)
+	// Add it to our list, display it, and return its ID.
+	int8_t newFoodID = numFoodItems;
+	foodPositions[newFoodID] = test_position;
+	return test_position;
+}
+
+
 /* Return the position of the given food item. The ID is assumed
 ** to be valid.
 */

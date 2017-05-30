@@ -6,10 +6,16 @@
 ** Details of the snake and making it move.
 */
 
+#include <stdio.h>
+#include <stdint.h>
+#include <avr/pgmspace.h>
+
 #include "position.h"
 #include "snake.h"
 #include "board.h"
 #include "food.h"
+#include "score.h"
+#include "terminalio.h"
 
 #define SNAKE_POSITION_ARRAY_SIZE ((MAX_SNAKE_SIZE)+1)
 
@@ -176,7 +182,7 @@ int8_t advance_snake_head(void) {
 			} else {
 				headX -= 1;
 			}
-		break;
+			break;
     }
 
 	newHeadPosn = position(headX, headY);
@@ -201,6 +207,9 @@ int8_t advance_snake_head(void) {
 	** and whether this has wrapped around in our array of positions
 	** or not. Update the length.
     */
+	add_to_score(1);
+
+	set_display_attribute(TERM_RESET);
 	snakeHeadIndex++;
 	if(snakeHeadIndex == SNAKE_POSITION_ARRAY_SIZE) {
 		/* Array has wrapped around */

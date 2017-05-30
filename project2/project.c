@@ -208,12 +208,24 @@ void play_game(void) {
 		} else if(serial_input == 'p' || serial_input == 'P') {
 			// Unimplemented feature - pause/unpause the game until 'p' or 'P' is
 			// pressed again. All other input (buttons, serial etc.) must be ignored.
+			uint32_t unpause_timer = get_clock_ticks()-last_move_time; //time until snake should move again
+			char new_serial_input;
+			while(1){
+				if(serial_input_available()){
+					new_serial_input = fgetc(stdin);
+					if (new_serial_input == 'p' || new_serial_input == 'P'){
+						last_move_time = get_clock_ticks()-(unpause_timer);
+						break;
+					}
+				}
+			}
+			
 		} 
 		// else - invalid input or we're part way through an escape sequence -
 		// do nothing
 		
 		// Check for timer related events here
-		if(get_clock_ticks() >= last_move_time + 600) {
+		if(get_clock_ticks() >= last_move_time + get_time_elapse()) {
 			// 600ms (0.6 second) has passed since the last time we moved the snake,
 			// so move it now
 			if(!attempt_to_move_snake_forward()) {
@@ -225,6 +237,7 @@ void play_game(void) {
 	}
 	// If we get here the game is over. 
 }
+
 
 void handle_game_over() {
 	move_cursor(10,14);

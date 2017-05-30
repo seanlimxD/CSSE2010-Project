@@ -54,7 +54,7 @@ int8_t food_at(PosnType posn);
 ** full or no free space can be found on the board after a reasonable
 ** number of attempts).
 */
-PosnType add_food_item(void);
+PosnType add_food_item();
 
 /* get_position_of_food(foodID)
 **
