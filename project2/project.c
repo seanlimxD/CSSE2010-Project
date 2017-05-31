@@ -28,6 +28,10 @@
 
 // Function prototypes - these are defined below (after main()) in the order
 // given here 
+
+// Seven segment display - segment values for digits 0 to 9
+uint8_t seven_seg[10] = {63,6,91,79,102,109,125,7,127,111};
+	
 void initialise_hardware(void);
 void splash_screen(void);
 void new_game(void);
@@ -72,8 +76,29 @@ void initialise_hardware(void) {
 	// Set up our main timer to give us an interrupt every millisecond
 	init_timer0();
 	
+	// Set up our seven segment display
+	init_SSD();
+	
 	// Turn on global interrupts
 	sei();
+}
+
+void display_digit(uint8_t number, uint8_t digit)
+{
+	if (number == 0 && digit == 1){
+		break;
+	}
+	PORTA = digit;
+	PORTC = seven_seg[number];	// We assume digit is in range 0 to 9
+}
+
+void init_SSD()
+{
+	/* Set port C (all pins) to be outputs */
+	DDRC = 0xFF;
+
+	/* Set port D, pin 0 to be an output */
+	DDRA = 1;
 }
 
 void splash_screen(void) {
@@ -191,6 +216,12 @@ void play_game(void) {
 				}
 			}
 		}
+		if (get_clock_ticks()%2 == 0){
+			display_digit(get_snake_length()%10, 0);
+		}
+		if (get_clock_ticks()%5 == 0){
+			display_digit(get_snake_length()/10, 1);
+		}
 		
 		// Process the input. 
 		if(button==0 || escape_sequence_char=='C') {
@@ -210,6 +241,8 @@ void play_game(void) {
 			// pressed again. All other input (buttons, serial etc.) must be ignored.
 			uint32_t unpause_timer = get_clock_ticks()-last_move_time; //time until snake should move again
 			char new_serial_input;
+			printf_P(PSTR("%d"), get_snake_length()%10);
+			printf_P(PSTR("%d"), get_snake_length()/10);
 			while(1){
 				if(serial_input_available()){
 					new_serial_input = fgetc(stdin);

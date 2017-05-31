@@ -38,11 +38,13 @@ void init_game(void) {
 	// Initialise the snake and display it. We know the initial snake is only
 	// of length two so we can just retrieve the tail and head positions
 	init_snake();
+	
 	update_display_at_position(get_snake_head_position(), SNAKE_HEAD_COLOUR);
 	update_display_at_position(get_snake_tail_position(), SNAKE_BODY_COLOUR);
 	
 	// Initialise our food store, then add three items of food and display them
 	init_food();
+	
 	for(int8_t i = 0; i < 3; i++) {
 		PosnType food_position = add_food_item();
 		if(is_position_valid(food_position)) {
@@ -67,7 +69,7 @@ int8_t attempt_to_move_snake_forward(void) {
 		int8_t foodID = food_at(new_head_position);
 		remove_food(foodID);
 		add_to_score(3);
-		time_elapse-=15;
+		time_elapse -= 15;
 		// Add a new food item. Might fail if a free position can't be 
 		// found on the board but shouldn't usually.
 		PosnType new_food_posn = add_food_item();
@@ -94,7 +96,7 @@ int8_t attempt_to_move_snake_forward(void) {
 	return 1;
 }
 
-int8_t get_time_elapse(){
+int get_time_elapse(){
 	return time_elapse;
 }
 
