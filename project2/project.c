@@ -21,13 +21,16 @@
 #include "timer0.h"
 #include "game.h"
 #include "snake.h"
+#include "food.h"
 
 // Define the CPU clock speed so we can use library delay functions
 #define F_CPU 8000000L
+#define superfood_interval 15000
+#define superfood_disappearance_interval 5000
 #include <util/delay.h>
 
 // Function prototypes - these are defined below (after main()) in the order
-// given here 
+// given here
 
 // Seven segment display - segment values for digits 0 to 9
 uint8_t seven_seg[10] = {63,6,91,79,102,109,125,7,127,111};
@@ -85,9 +88,6 @@ void initialise_hardware(void) {
 
 void display_digit(uint8_t number, uint8_t digit)
 {
-	if (number == 0 && digit == 1){
-		break;
-	}
 	PORTA = digit;
 	PORTC = seven_seg[number];	// We assume digit is in range 0 to 9
 }
@@ -161,13 +161,23 @@ void new_game(void) {
 
 void play_game(void) {
 	uint32_t last_move_time;
+	uint32_t last_rat_move_time;
 	int8_t button;
 	char serial_input, escape_sequence_char;
 	uint8_t characters_into_escape_sequence = 0;
 	
+	int superfood_available;
+	
+	uint32_t last_superfood_time;
+	
 	// Record the last time the snake moved as the current time -
 	// this ensures we don't move the snake immediately.
-	last_move_time = get_clock_ticks();
+	last_move_time = get_clock_ticks();	
+	
+	last_superfood_time = get_clock_ticks();
+	
+	last_rat_move_time = get_clock_ticks();
+	
 	
 	// We play the game forever. If the game is over, we will break out of
 	// this loop. The loop checks for events (button pushes, serial input etc.)
@@ -219,7 +229,7 @@ void play_game(void) {
 		if (get_clock_ticks()%2 == 0){
 			display_digit(get_snake_length()%10, 0);
 		}
-		if (get_clock_ticks()%5 == 0){
+		if (get_clock_ticks()%5 == 0 && get_snake_length()/10 != 0){
 			display_digit(get_snake_length()/10, 1);
 		}
 		
@@ -241,9 +251,14 @@ void play_game(void) {
 			// pressed again. All other input (buttons, serial etc.) must be ignored.
 			uint32_t unpause_timer = get_clock_ticks()-last_move_time; //time until snake should move again
 			char new_serial_input;
-			printf_P(PSTR("%d"), get_snake_length()%10);
-			printf_P(PSTR("%d"), get_snake_length()/10);
 			while(1){
+				if (get_clock_ticks()%2 == 0){
+					display_digit(get_snake_length()%10, 0);
+				}
+				if (get_clock_ticks()%5 == 0 && get_snake_length()/10 != 0){
+					display_digit(get_snake_length()/10, 1);
+				}
+				
 				if(serial_input_available()){
 					new_serial_input = fgetc(stdin);
 					if (new_serial_input == 'p' || new_serial_input == 'P'){
@@ -266,6 +281,27 @@ void play_game(void) {
 				break;
 			}
 			last_move_time = get_clock_ticks();
+		}
+		
+		if (get_clock_ticks() >= last_superfood_time+superfood_interval) {
+			//spawn superfood
+			if (!attempt_to_spawn_superfood()) {
+				break;
+			}
+			last_superfood_time = get_clock_ticks();
+			superfood_available = 1;
+		}
+		
+		if (get_clock_ticks() >= last_superfood_time+superfood_disappearance_interval && superfood_available) {
+			attempt_to_remove_superfood();
+			superfood_available = 0;
+		}
+		
+		if (get_clock_ticks() >= last_rat_move_time + get_time_elapse()*2){
+			if (!attempt_to_move_rat()) {
+				break;
+			}
+			last_rat_move_time = get_clock_ticks();
 		}
 	}
 	// If we get here the game is over. 

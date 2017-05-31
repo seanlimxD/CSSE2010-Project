@@ -71,4 +71,8 @@ PosnType get_position_of_food(int8_t foodID);
 */
 void remove_food(int8_t foodID);
 
+void remove_super_food();
+
+void add_superfood();
+
 #endif

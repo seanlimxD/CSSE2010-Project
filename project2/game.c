@@ -2,7 +2,8 @@
  * game.c
  *
  * Written by Peter Sutton
- */ 
+ */
+#include <stdlib.h>
 
 #include "game.h"
 #include "snake.h"
@@ -16,8 +17,8 @@
 #define SNAKE_HEAD_COLOUR	COLOUR_RED
 #define SNAKE_BODY_COLOUR	COLOUR_GREEN
 #define FOOD_COLOUR			COLOUR_LIGHT_YELLOW
-#define SUPER_FOOD_COLOUR	COLOUR_ORANGE
 #define BACKGROUND_COLOUR	COLOUR_BLACK
+#define SUPERFOOD_COLOUR	COLOUR_ORANGE
 
 
 // Define time interval
@@ -81,6 +82,11 @@ int8_t attempt_to_move_snake_forward(void) {
 		// display the snake head at that position.
 	}
 	
+	if (move_result == ATE_SUPERFOOD) {
+		add_to_score(10);
+		attempt_to_remove_superfood();
+	}
+	
 	// If we didn't eat food OR if we ate food but the snake is at 
 	// maximum length, then we move the tail forward and remove this 
 	// element from the display
@@ -94,6 +100,38 @@ int8_t attempt_to_move_snake_forward(void) {
 	update_display_at_position(prior_head_position, SNAKE_BODY_COLOUR);
 	update_display_at_position(new_head_position, SNAKE_HEAD_COLOUR);
 	return 1;
+}
+
+int8_t attempt_to_move_rat(void){
+	PosnType prior_rat_position= get_position_of_food(0);
+	int8_t move_result = move_rat();
+	if(move_result < 0) {
+		return 0;
+	}
+	PosnType new_rat_position = get_position_of_food(0);
+	
+	if(move_result == MOVE_OK) {
+		update_display_at_position(prior_rat_position, BACKGROUND_COLOUR);
+	}
+	
+	update_display_at_position(new_rat_position, FOOD_COLOUR);
+	return 1;
+}
+
+int8_t attempt_to_spawn_superfood(void){
+	PosnType superfood_posn;
+	superfood_posn = add_super_food();
+	if (is_position_valid(superfood_posn)){
+		update_display_at_position(superfood_posn, COLOUR_ORANGE);
+	}
+	return 1;
+} 
+
+void attempt_to_remove_superfood(void){
+	if (get_superfood_position() != position(NULL,NULL)){
+		update_display_at_position(get_superfood_position(), BACKGROUND_COLOUR);
+		remove_super_food();	
+	}
 }
 
 int get_time_elapse(){

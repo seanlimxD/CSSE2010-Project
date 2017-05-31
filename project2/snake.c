@@ -229,7 +229,11 @@ int8_t advance_snake_head(void) {
 		} else {
 			return ATE_FOOD_BUT_CANT_GROW;
 		}
-	} else {
+	}
+	else if (superfood_at(newHeadPosn)) {
+		return ATE_SUPERFOOD;
+	}
+	 else {
 		return MOVE_OK;
 	}
 }

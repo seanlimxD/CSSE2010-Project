@@ -25,6 +25,7 @@ typedef enum {SNAKE_UP, SNAKE_RIGHT, SNAKE_DOWN, SNAKE_LEFT} SnakeDirnType;
 #define MOVE_OK 1
 #define ATE_FOOD 2
 #define ATE_FOOD_BUT_CANT_GROW 3
+#define ATE_SUPERFOOD 4
 
 /* init_snake()
 **

@@ -21,4 +21,11 @@ void init_game(void);
 // supplied code.)
 int8_t attempt_to_move_snake_forward(void);
 
+
+// Attempts to spawn superfood. If superfood is successfully spawned, return
+// 1.
+int8_t attempt_to_spawn_superfood(void);
+
+void remove_superfood(void);
+
 #endif /* GAME_H_ */

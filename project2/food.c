@@ -4,6 +4,7 @@
 ** Written by Peter Sutton
 **
 */
+#include <stdlib.h>
 
 #include "position.h"
 #include "food.h"
@@ -20,6 +21,7 @@
 **
 */
 PosnType foodPositions[MAX_FOOD];
+PosnType superfood_position;
 int8_t numFoodItems;
 
 /* 
@@ -49,6 +51,13 @@ int8_t food_at(PosnType posn) {
     }
     // No food found at the given position.
     return -1;
+}
+
+int8_t superfood_at(PosnType posn) {
+	if (posn == superfood_position){
+		return 1;
+	}
+	return 0;
 }
 
 /* Add a food item and return the position - or 
@@ -92,12 +101,37 @@ PosnType add_food_item(void) {
 	return test_position;
 }
 
+PosnType add_super_food(void){
+	int8_t x, y, attempts;
+	PosnType test_position;
+	x = 0;
+	y = 0;
+	attempts = 0;
+	do {
+		// Generate a new position - this is based on a sequence rather
+		// then being random
+		x = rand()%BOARD_WIDTH;
+		y = rand()%BOARD_HEIGHT;
+		test_position = position(x,y);
+		attempts++;
+	} while(attempts < 100 && (is_snake_at(test_position) || is_food_at(test_position)));
+	if (attempts >= 100) {
+		return INVALID_POSITION;
+	}
+	superfood_position = test_position;
+	return test_position;
+}
+
 
 /* Return the position of the given food item. The ID is assumed
 ** to be valid.
 */
 PosnType get_position_of_food(int8_t foodID) {
 	return foodPositions[foodID];
+}
+
+PosnType get_superfood_position(){
+	return superfood_position;
 }
 
 /*
@@ -120,3 +154,64 @@ void remove_food(int8_t foodID) {
     numFoodItems--;
 }
 
+void remove_super_food(){
+	superfood_position = position(NULL,NULL);
+}
+
+int8_t move_rat(void) {
+	int8_t ratX;	/* head X position */
+	int8_t ratY;	/* head Y position */
+	PosnType newRatPosn;
+    
+	/* Current head position */
+	ratX = x_position(foodPositions[0]);
+	ratY = y_position(foodPositions[0]);
+    
+    /* Work out where the new head position should be - we
+    ** move 1 position in our NEXT direction of movement if we can.
+	** If we're at the edge of the board, then we wrap around to
+	** the other edge.
+    */
+    switch (rand()%4) {
+        case 1:
+			if(ratY == BOARD_HEIGHT - 1 || (is_snake_at(newRatPosn) == 1 || food_at(newRatPosn) || superfood_at(newRatPosn))) {
+				// Head is already at the top of the board - wrap around
+				ratY -= 1;
+			} else {
+	            ratY += 1;
+			}
+            break;
+        case 2:
+			if(ratX == BOARD_WIDTH - 1 || (is_snake_at(newRatPosn) == 1 || food_at(newRatPosn) || superfood_at(newRatPosn))) {
+				// Snake head is already at the right hand edge of the board
+				// - wrap around to left hand side
+				ratX -= 1;
+			} else {
+				ratX += 1;
+			}
+            break;
+		/* YOUR CODE HERE to deal with other directions */
+		case 3:
+			if(ratY == 0 || (is_snake_at(newRatPosn) == 1 || food_at(newRatPosn) || superfood_at(newRatPosn))) {
+			// Head is already at the bottom of the board - wrap around
+			ratY += 1;
+			} else {
+			ratY -= 1;
+			}
+			break;
+		case 4:
+			if(ratX == 0 || (is_snake_at(newRatPosn) == 1 || food_at(newRatPosn) || superfood_at(newRatPosn))) {
+				// Snake head is already at the right hand edge of the board
+				// - wrap around to left hand side
+				ratX += 1;
+			} else {
+				ratX -= 1;
+			}
+			break;
+    }
+
+	newRatPosn = position(ratX, ratY);
+	/* Store the head position */
+	foodPositions[0] = newRatPosn;
+	return MOVE_OK;
+}
