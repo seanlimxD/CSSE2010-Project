@@ -21,11 +21,17 @@ void init_game(void);
 // supplied code.)
 int8_t attempt_to_move_snake_forward(void);
 
+void remove_superfood(void);
+
+int8_t attempt_to_move_rat(void);
 
 // Attempts to spawn superfood. If superfood is successfully spawned, return
 // 1.
 int8_t attempt_to_spawn_superfood(void);
 
-void remove_superfood(void);
+void attempt_to_remove_superfood(void);
+
+// Retrieves the current time between each movement
+int get_time_elapse(void);
 
 #endif /* GAME_H_ */

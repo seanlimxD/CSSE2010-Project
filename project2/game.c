@@ -128,13 +128,13 @@ int8_t attempt_to_spawn_superfood(void){
 } 
 
 void attempt_to_remove_superfood(void){
-	if (get_superfood_position() != position(NULL,NULL)){
+	if (get_superfood_position() != position(-1,-1)){
 		update_display_at_position(get_superfood_position(), BACKGROUND_COLOUR);
 		remove_super_food();	
 	}
 }
 
-int get_time_elapse(){
+int get_time_elapse(void){
 	return time_elapse;
 }
 

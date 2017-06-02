@@ -36,4 +36,5 @@ int8_t serial_input_available(void);
  */
 void clear_serial_input_buffer(void);
 
+void init_SSD(void);
 #endif /* SERIALIO_H_ */

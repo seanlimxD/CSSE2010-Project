@@ -47,6 +47,8 @@ uint8_t is_food_at(PosnType posn);
 */
 int8_t food_at(PosnType posn);
 
+int8_t superfood_at(PosnType posn);
+
 /* add_food_item
 **
 ** Add a food item to the game and return its position OR
@@ -56,12 +58,16 @@ int8_t food_at(PosnType posn);
 */
 PosnType add_food_item();
 
+PosnType add_super_food(void);
+
 /* get_position_of_food(foodID)
 **
 ** Returns the position of the given food ID. foodID must be valid.
 ** If not, the return value is undefined.
 */
 PosnType get_position_of_food(int8_t foodID);
+
+PosnType get_superfood_position(void);
 
 /* remove_food(foodID)
 **
@@ -73,6 +79,8 @@ void remove_food(int8_t foodID);
 
 void remove_super_food();
 
-void add_superfood();
+int8_t move_rat(void);
+
+
 
 #endif

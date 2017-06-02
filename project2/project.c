@@ -54,6 +54,7 @@ int main(void) {
 	// Show the splash screen message. Returns when display
 	// is complete
 	splash_screen();
+//	handle_game_over();
 	
 	while(1) {
 		new_game();
@@ -84,21 +85,13 @@ void initialise_hardware(void) {
 	
 	// Turn on global interrupts
 	sei();
+
 }
 
 void display_digit(uint8_t number, uint8_t digit)
 {
 	PORTA = digit;
 	PORTC = seven_seg[number];	// We assume digit is in range 0 to 9
-}
-
-void init_SSD()
-{
-	/* Set port C (all pins) to be outputs */
-	DDRC = 0xFF;
-
-	/* Set port D, pin 0 to be an output */
-	DDRA = 1;
 }
 
 void splash_screen(void) {
@@ -111,11 +104,12 @@ void splash_screen(void) {
 	printf_P(PSTR("Snake"));
 	
 	move_cursor(3,5);
-	set_display_attribute(FG_GREEN);	// Make the text green
 	// Modify the following line
-	printf_P(PSTR("CSSE2010/7201 Snake Project by Sean Lim"));	
-	set_display_attribute(FG_WHITE);	// Return to default colour (White)
-	
+	show_leaders();
+	set_display_attribute(FG_GREEN);	// Make the text green
+	printf_P(PSTR("CSSE2010/7201 Snake Project by Sean Lim"));
+
+	set_display_attribute(FG_WHITE);	// Return to default colour (White)	
 	// Output the scrolling message to the LED matrix
 	// and wait for a push button to be pushed.
 	ledmatrix_clear();
@@ -166,7 +160,7 @@ void play_game(void) {
 	char serial_input, escape_sequence_char;
 	uint8_t characters_into_escape_sequence = 0;
 	
-	int superfood_available;
+	int superfood_available = 0;
 	
 	uint32_t last_superfood_time;
 	
@@ -309,10 +303,25 @@ void play_game(void) {
 
 
 void handle_game_over() {
-	move_cursor(10,14);
+	move_cursor(10,5);
 	// Print a message to the terminal. 
-	printf_P(PSTR("GAME OVER"));
-	move_cursor(10,15);
+	printf_P(PSTR("GAME OVER\n"));
+	uint8_t high_score = is_leader();
+	if (high_score){
+		move_cursor(10,7);
+		printf_P(PSTR("\n"));
+		printf_P(PSTR("********************************\n"));
+		printf_P(PSTR("*  Congratulations!            *\n"));
+		printf_P(PSTR("*  You are on the leader board.*\n"));
+		printf_P(PSTR("********************************\n"));
+		printf_P(PSTR("Your Name: "));
+		show_cursor();
+		for (;;) {
+		}
+		write_leaders();
+	}
+	
+	move_cursor(10,20);
 	printf_P(PSTR("Press a button to start again"));
 	while(button_pushed() == -1) {
 		; // wait until a button has been pushed
