@@ -302,18 +302,12 @@ ISR(USART0_RX_vect)
 	}
 }
 
-uint8_t input_size(){
-	return bytes_in_input_buffer;
-}
-
-uint8_t input_contents(){
-	return input_buffer;
-}
 
 void init_SSD(void){
 	/* Set port C (all pins) to be outputs */
 	DDRC = 0xFF;
 
-	/* Set port D, pin 2 to be an output */
-	DDRA |= (1<<2);
+	/* Set port A, pin 0 to be an output */
+	DDRA = 1;
 }
+

@@ -35,6 +35,6 @@ int8_t serial_input_available(void);
  * have been typed when we didn't want them - clear them.
  */
 void clear_serial_input_buffer(void);
-
+char input_user(void);
 void init_SSD(void);
 #endif /* SERIALIO_H_ */

@@ -14,6 +14,7 @@ void add_to_score(uint16_t value);
 uint32_t get_score(void);
 void write_to_EEPROM(uint8_t leader);
 void show_leaders();
+void write_leaders();
 uint8_t is_leader();
 
 #endif /* SCORE_H_ */

@@ -11,6 +11,7 @@
 
 #include "score.h"
 #include "terminalio.h"
+#include "serialio.h"
 
 // Variable to keep track of the score. We declare it as static
 // to ensure that it is only visible within this module - other
@@ -77,46 +78,49 @@ void show_leaders(){
 }
 
 uint8_t is_leader(){
+	score = 5000;
+	eeprom_update_word(topscore5, score);
+	uint8_t new_leader[NAME_SIZE]="NewLeader";
 	if ( !eeprom_is_ready () ) {
 		printf_P (PSTR ("Waiting for EEPROM to become ready...\n"));
 		eeprom_busy_wait ();
 	}
+		if (score > top5){
+			eeprom_update_word(topscore5, score);
+			eeprom_update_block(&new_leader, &leaderp5, NAME_SIZE);
+		}
+		if (score > top4){
+			eeprom_update_word(topscore5, top4);
+			eeprom_update_block(&leader4, &leaderp5, NAME_SIZE);
+			eeprom_update_word(topscore4, score);
+			eeprom_update_block(&new_leader, &leaderp4, NAME_SIZE);
+		}
+		if (score > top3){
+			eeprom_update_word(topscore4, top3);
+			eeprom_update_block(&leader3, &leaderp4, NAME_SIZE);
+			eeprom_update_word(topscore3, score);
+			eeprom_update_block(&new_leader, &leaderp3, NAME_SIZE);
+		}
+		if (score > top2){
+			eeprom_update_block(&leader2, &leaderp3, NAME_SIZE);
+			eeprom_update_word(topscore3, top2);
+			eeprom_update_block(&new_leader, &leaderp2, NAME_SIZE);
+			eeprom_update_word(topscore2, score);
+		}
+		if (score > top1){
+			eeprom_update_block(&leader1, &leaderp2, NAME_SIZE);
+			eeprom_update_word(topscore2, top1);
+			eeprom_update_word(topscore1, score);
+			eeprom_update_block(new_leader, leaderp1, NAME_SIZE);
+		}
+
 	if (score > top5) return 1; else return 0;
+	
 }
 
 void write_leaders(){
 	uint8_t new_leader[NAME_SIZE]="Anonymous";
-	if (score > top5){
-		eeprom_update_word(topscore5, score);
-		if (input_size() > 2) eeprom_update_block((const void *) input_buffer(), leaderp5, NAME_SIZE);
-		else eeprom_update_block(new_leader, leaderp5, NAME_SIZE);
-	}
-	if (score > top4){
-		eeprom_update_word(topscore5, top4);
-		eeprom_update_block(leader4, leaderp5, NAME_SIZE);
-		eeprom_update_word(topscore4, score);
-		if (input_size() > 2) eeprom_update_block((const void *) input_buffer(), leaderp4, NAME_SIZE);
-		else eeprom_update_block(new_leader, leaderp4, NAME_SIZE);
-	}
-	if (score > top3){
-		eeprom_update_word(topscore4, top3);
-		eeprom_update_block(leader3, leaderp4, NAME_SIZE);
-		eeprom_update_word(topscore3, score);
-		if (input_size() > 2) eeprom_update_block((const void *) input_buffer(), leaderp3, NAME_SIZE);
-		else eeprom_update_block(new_leader, leaderp3, NAME_SIZE);
-	}
-	if (score > top2){
-	    eeprom_update_block(leader2, leaderp3, NAME_SIZE);
-		eeprom_update_word(topscore3, top2);
-		if (input_size() > 2) eeprom_update_block((const void *) input_buffer(), leaderp2, NAME_SIZE);
-		else eeprom_update_block(new_leader, leaderp2, NAME_SIZE);
-		eeprom_update_word(topscore2, score);
-	}
-	if (score > top1){
-	    eeprom_update_block(leader1, leaderp2, NAME_SIZE);
-		eeprom_update_word(topscore2, top1);
-		eeprom_update_word(topscore1, score);
-		if (input_size() > 2) eeprom_update_block((const void *) input_buffer(), leaderp1, NAME_SIZE);
-		else eeprom_update_block(new_leader, leaderp1, NAME_SIZE);
+	if (input_user()>2) {
+//		no time to update the name of the new_leader		
 	}
 }
